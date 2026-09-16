@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tamil Bible Reading Tracker | இயேசு கிறிஸ்துவின் அன்பின் ஊழியம்</title>
+  <meta name="description" content="Tamil and English Bible Reading Tracker - Jesus Christ's Loving Ministry by Pethuraj" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Mukta Malar', 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-amber-500 selection:text-slate-950">
+  <div id="root"></div>
+
+  <script>
+    // 66 CANONICAL BIBLE BOOKS DATABASE
+    const BIBLE_BOOKS = [
+      { id: 1, nameTa: 'ஆதியாகமம்', nameEn: 'Genesis', testament: 'OT', categoryTa: 'மோசேயின் ஆகமங்கள்', chaptersCount: 50, totalVerses: 1533, chapterVerses: [31,25,24,26,32,22,24,22,29,32,32,20,18,24,21,16,27,33,38,18,34,24,20,67,34,35,46,22,35,43,55,32,20,31,29,43,36,30,23,23,57,38,34,34,28,34,31,22,33,26] },
+      { id: 2, nameTa: 'யாத்திராகமம்', nameEn: 'Exodus', testament: 'OT', categoryTa: 'மோசேயின் ஆகமங்கள்', chaptersCount: 40, totalVerses: 1213, chapterVerses: [22,25,22,31,23,30,25,32,35,29,10,51,22,31,27,36,16,27,25,26,36,31,33,18,40,37,21,43,46,38,18,35,23,35,35,38,29,31,43,38] },
+      { id: 3, nameTa: 'லேவியராகமம்', nameEn: 'Leviticus', testament: 'OT', categoryTa: 'மோசேயின் ஆகமங்கள்', chaptersCount: 27, totalVerses: 859, chapterVerses: [17,16,17,35,19,30,38,36,24,20,47,8,59,57,33,34,16,30,37,27,24,33,44,23,55,46,34] },
+      { id: 4, nameTa: 'எண்ணாகமம்', nameEn: 'Numbers', testament: 'OT', categoryTa: 'மோசேயின் ஆகமங்கள்', chaptersCount: 36, totalVerses: 1288, chapterVerses: [54,34,51,49,31,27,89,26,23,36,35,16,33,45,41,50,13,32,22,29,35,41,30,25,18,65,23,31,40,16,54,42,56,29,34,13] },
+      { id: 5, nameTa: 'உபாகமம்', nameEn: 'Deuteronomy', testament: 'OT', categoryTa: 'மோசேயின் ஆகமங்கள்', chaptersCount: 34, totalVerses: 959, chapterVerses: [46,37,29,49,33,25,26,20,29,22,32,32,18,29,23,22,20,22,21,20,23,30,25,22,19,19,26,68,29,20,30,52,29,12] },
+      { id: 6, nameTa: 'யோசுவா', nameEn: 'Joshua', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 24, totalVerses: 658, chapterVerses: [18,24,17,24,15,27,26,35,27,43,23,24,33,15,63,10,18,28,51,9,45,34,16,33] },
+      { id: 7, nameTa: 'நியாயாதிபதிகள்', nameEn: 'Judges', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 21, totalVerses: 618, chapterVerses: [36,23,31,24,31,40,25,35,57,18,40,15,25,20,20,31,13,31,30,48,25] },
+      { id: 8, nameTa: 'ரூத்', nameEn: 'Ruth', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 4, totalVerses: 85, chapterVerses: [22,23,18,22] },
+      { id: 9, nameTa: '1 சாமுவேல்', nameEn: '1 Samuel', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 31, totalVerses: 810, chapterVerses: [28,36,21,22,12,21,17,22,27,27,15,25,23,52,35,23,58,30,24,42,15,23,29,22,44,25,12,25,11,31,13] },
+      { id: 10, nameTa: '2 சாமுவேல்', nameEn: '2 Samuel', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 24, totalVerses: 695, chapterVerses: [27,32,39,12,25,23,29,18,13,19,27,31,39,33,37,23,29,33,43,26,22,51,39,25] },
+      { id: 11, nameTa: '1 இராஜாக்கள்', nameEn: '1 Kings', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 22, totalVerses: 816, chapterVerses: [53,46,28,34,18,38,51,66,28,29,43,33,34,31,34,34,24,46,21,43,29,53] },
+      { id: 12, nameTa: '2 இராஜாக்கள்', nameEn: '2 Kings', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 25, totalVerses: 719, chapterVerses: [18,25,27,44,27,33,20,29,37,36,21,21,25,29,38,20,41,37,37,21,26,20,37,20,30] },
+      { id: 13, nameTa: '1 நாளாகமம்', nameEn: '1 Chronicles', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 29, totalVerses: 942, chapterVerses: [54,55,24,43,26,81,40,40,44,14,47,40,14,17,29,43,27,17,19,8,30,19,32,31,31,32,34,21,30] },
+      { id: 14, nameTa: '2 நாளாகமம்', nameEn: '2 Chronicles', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 36, totalVerses: 822, chapterVerses: [17,18,17,22,14,42,22,18,31,19,23,16,22,15,19,14,19,34,11,37,20,12,21,27,28,23,9,27,36,27,21,33,25,33,27,23] },
+      { id: 15, nameTa: 'எஸ்றா', nameEn: 'Ezra', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 10, totalVerses: 280, chapterVerses: [11,70,13,24,17,22,28,36,15,44] },
+      { id: 16, nameTa: 'நெகேமியா', nameEn: 'Nehemiah', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 13, totalVerses: 406, chapterVerses: [11,20,32,23,19,19,73,18,38,39,36,47,31] },
+      { id: 17, nameTa: 'எஸ்தர்', nameEn: 'Esther', testament: 'OT', categoryTa: 'வரலாற்று நூல்கள்', chaptersCount: 10, totalVerses: 167, chapterVerses: [22,23,15,17,14,14,10,17,32,3] },
+      { id: 18, nameTa: 'யோபு', nameEn: 'Job', testament: 'OT', categoryTa: 'ஞான நூல்கள்', chaptersCount: 42, totalVerses: 1070, chapterVerses: [22,13,26,21,27,30,21,22,35,22,20,25,28,22,35,22,16,21,29,29,34,30,17,25,6,14,23,28,25,31,40,22,33,37,16,33,24,41,30,24,34,17] },
+      { id: 19, nameTa: 'சங்கீதம்', nameEn: 'Psalms', testament: 'OT', categoryTa: 'ஞான நூல்கள்', chaptersCount: 150, totalVerses: 2461, chapterVerses: [6,12,8,8,12,10,17,9,20,18,7,8,6,7,5,11,15,50,14,9,13,31,6,10,22,12,14,9,11,12,24,11,22,22,28,12,40,22,13,17,13,11,5,26,17,11,9,14,20,23,19,9,6,7,23,13,11,11,17,12,8,12,11,10,13,20,7,35,36,5,24,20,28,23,10,12,20,72,13,19,16,8,18,12,13,17,7,18,52,17,16,15,5,23,11,13,12,9,9,5,8,28,22,35,45,48,43,13,31,7,10,10,9,8,18,19,2,29,176,7,8,9,4,8,5,6,5,6,8,8,3,18,3,3,21,26,9,8,24,13,10,7,12,15,21,10,20,14,9,6] },
+      { id: 20, nameTa: 'நீதிமொழிகள்', nameEn: 'Proverbs', testament: 'OT', categoryTa: 'ஞான நூல்கள்', chaptersCount: 31, totalVerses: 915, chapterVerses: [33,22,35,27,23,35,27,36,18,32,31,28,25,35,33,33,28,24,29,30,31,29,35,34,28,28,27,28,27,33,31] },
+      { id: 21, nameTa: 'பிரசங்கி', nameEn: 'Ecclesiastes', testament: 'OT', categoryTa: 'ஞான நூல்கள்', chaptersCount: 12, totalVerses: 222, chapterVerses: [18,26,22,16,20,12,29,17,18,20,10,14] },
+      { id: 22, nameTa: 'உன்னதப்பாட்டு', nameEn: 'Song of Solomon', testament: 'OT', categoryTa: 'ஞான நூல்கள்', chaptersCount: 8, totalVerses: 117, chapterVerses: [17,17,11,16,16,13,13,14] },
+      { id: 23, nameTa: 'ஏசாயா', nameEn: 'Isaiah', testament: 'OT', categoryTa: 'பெரிய தீர்க்கதரிசிகள்', chaptersCount: 66, totalVerses: 1292, chapterVerses: [31,22,26,6,30,13,25,22,21,34,16,6,22,32,9,14,14,7,25,6,10,25,18,23,12,21,13,29,24,33,9,20,24,17,10,22,38,22,8,31,29,25,28,28,25,13,15,22,26,11,23,15,12,17,13,12,21,14,21,22,11,12,19,12,25,24] },
+      { id: 24, nameTa: 'எரேமியா', nameEn: 'Jeremiah', testament: 'OT', categoryTa: 'பெரிய தீர்க்கதரிசிகள்', chaptersCount: 52, totalVerses: 1364, chapterVerses: [19,37,25,31,31,30,34,22,26,25,23,17,27,22,21,21,27,23,15,18,14,30,40,10,38,24,22,17,32,24,40,44,26,22,19,32,21,28,18,16,18,22,13,30,5,28,7,47,39,46,64,34] },
+      { id: 25, nameTa: 'புலம்பல்', nameEn: 'Lamentations', testament: 'OT', categoryTa: 'பெரிய தீர்க்கதரிசிகள்', chaptersCount: 5, totalVerses: 154, chapterVerses: [22,22,66,22,22] },
+      { id: 26, nameTa: 'எசேக்கியேல்', nameEn: 'Ezekiel', testament: 'OT', categoryTa: 'பெரிய தீர்க்கதரிசிகள்', chaptersCount: 48, totalVerses: 1273, chapterVerses: [28,10,27,17,17,14,27,18,11,22,25,28,23,23,8,63,24,32,14,49,32,31,49,27,17,21,36,26,21,26,18,32,33,31,15,38,28,23,29,49,26,20,27,31,25,24,23,35] },
+      { id: 27, nameTa: 'தானியேல்', nameEn: 'Daniel', testament: 'OT', categoryTa: 'பெரிய தீர்க்கதரிசிகள்', chaptersCount: 12, totalVerses: 357, chapterVerses: [21,49,30,37,31,28,28,27,27,21,45,13] },
+      { id: 28, nameTa: 'ஓசியா', nameEn: 'Hosea', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 14, totalVerses: 197, chapterVerses: [11,23,5,19,15,11,16,14,17,15,12,14,16,9] },
+      { id: 29, nameTa: 'யோவேல்', nameEn: 'Joel', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 3, totalVerses: 73, chapterVerses: [20,32,21] },
+      { id: 30, nameTa: 'ஆமோஸ்', nameEn: 'Amos', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 9, totalVerses: 146, chapterVerses: [15,16,15,13,27,14,17,14,15] },
+      { id: 31, nameTa: 'ஒபதியா', nameEn: 'Obadiah', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 1, totalVerses: 21, chapterVerses: [21] },
+      { id: 32, nameTa: 'யோனா', nameEn: 'Jonah', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 4, totalVerses: 48, chapterVerses: [17,10,10,11] },
+      { id: 33, nameTa: 'மீகா', nameEn: 'Micah', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 7, totalVerses: 105, chapterVerses: [16,13,12,13,15,16,20] },
+      { id: 34, nameTa: 'நாகூம்', nameEn: 'Nahum', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 3, totalVerses: 47, chapterVerses: [15,13,19] },
+      { id: 35, nameTa: 'ஆபகூக்', nameEn: 'Habakkuk', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 3, totalVerses: 56, chapterVerses: [17,20,19] },
+      { id: 36, nameTa: 'செப்பனியா', nameEn: 'Zephaniah', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 3, totalVerses: 53, chapterVerses: [18,15,20] },
+      { id: 37, nameTa: 'ஆகாய்', nameEn: 'Haggai', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 2, totalVerses: 38, chapterVerses: [15,23] },
+      { id: 38, nameTa: 'சகரியா', nameEn: 'Zechariah', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 14, totalVerses: 211, chapterVerses: [21,13,10,14,11,15,14,23,17,12,17,14,9,21] },
+      { id: 39, nameTa: 'மல்கியா', nameEn: 'Malachi', testament: 'OT', categoryTa: 'சிறிய தீர்க்கதரிசிகள்', chaptersCount: 4, totalVerses: 55, chapterVerses: [14,17,18,6] },
+      { id: 40, nameTa: 'மத்தேயு', nameEn: 'Matthew', testament: 'NT', categoryTa: 'சுவிசேஷங்கள்', chaptersCount: 28, totalVerses: 1071, chapterVerses: [25,23,17,25,48,34,29,34,38,42,30,50,58,36,39,28,27,35,30,34,46,46,39,51,46,75,66,20] },
+      { id: 41, nameTa: 'மாற்கு', nameEn: 'Mark', testament: 'NT', categoryTa: 'சுவிசேஷங்கள்', chaptersCount: 16, totalVerses: 678, chapterVerses: [45,28,35,41,43,56,37,38,50,52,33,44,37,72,47,20] },
+      { id: 42, nameTa: 'லூக்கா', nameEn: 'Luke', testament: 'NT', categoryTa: 'சுவிசேஷங்கள்', chaptersCount: 24, totalVerses: 1151, chapterVerses: [80,52,38,44,39,49,50,56,62,42,54,59,35,35,32,31,37,43,48,47,38,71,56,53] },
+      { id: 43, nameTa: 'யோவான்', nameEn: 'John', testament: 'NT', categoryTa: 'சுவிசேஷங்கள்', chaptersCount: 21, totalVerses: 879, chapterVerses: [51,25,36,54,47,71,53,59,41,42,57,50,38,31,27,33,26,40,42,31,25] },
+      { id: 44, nameTa: 'அப்போஸ்தலர்', nameEn: 'Acts', testament: 'NT', categoryTa: 'வரலாறு', chaptersCount: 28, totalVerses: 1007, chapterVerses: [26,47,26,37,42,15,60,40,43,48,30,25,52,28,41,40,34,28,41,38,40,30,35,27,27,32,44,31] },
+      { id: 45, nameTa: 'ரோமர்', nameEn: 'Romans', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 16, totalVerses: 433, chapterVerses: [32,29,31,25,21,23,25,39,33,21,36,21,14,23,33,27] },
+      { id: 46, nameTa: '1 கொரிந்தியர்', nameEn: '1 Corinthians', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 16, totalVerses: 437, chapterVerses: [31,16,23,21,13,20,40,13,27,33,34,31,13,40,58,24] },
+      { id: 47, nameTa: '2 கொரிந்தியர்', nameEn: '2 Corinthians', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 13, totalVerses: 257, chapterVerses: [24,17,18,18,21,18,16,24,15,18,33,21,14] },
+      { id: 48, nameTa: 'கலாத்தியர்', nameEn: 'Galatians', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 6, totalVerses: 149, chapterVerses: [24,21,29,31,26,18] },
+      { id: 49, nameTa: 'எபேசியர்', nameEn: 'Ephesians', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 6, totalVerses: 155, chapterVerses: [23,22,21,32,33,24] },
+      { id: 50, nameTa: 'பிலிப்பியர்', nameEn: 'Philippians', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 4, totalVerses: 104, chapterVerses: [30,30,21,23] },
+      { id: 51, nameTa: 'கொலோசெயர்', nameEn: 'Colossians', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 4, totalVerses: 95, chapterVerses: [29,23,25,18] },
+      { id: 52, nameTa: '1 தெசலோனிக்கேயர்', nameEn: '1 Thessalonians', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 5, totalVerses: 89, chapterVerses: [10,20,13,18,28] },
+      { id: 53, nameTa: '2 தெசலோனிக்கேயர்', nameEn: '2 Thessalonians', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 3, totalVerses: 47, chapterVerses: [12,17,18] },
+      { id: 54, nameTa: '1 தீமோத்தேயு', nameEn: '1 Timothy', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 6, totalVerses: 113, chapterVerses: [20,15,16,16,25,21] },
+      { id: 55, nameTa: '2 தீமோத்தேயு', nameEn: '2 Timothy', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 4, totalVerses: 83, chapterVerses: [18,26,17,22] },
+      { id: 56, nameTa: 'தீத்து', nameEn: 'Titus', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 3, totalVerses: 46, chapterVerses: [16,15,15] },
+      { id: 57, nameTa: 'பிலேமோன்', nameEn: 'Philemon', testament: 'NT', categoryTa: 'பவுலின் நிருபங்கள்', chaptersCount: 1, totalVerses: 25, chapterVerses: [25] },
+      { id: 58, nameTa: 'எபிரெயர்', nameEn: 'Hebrews', testament: 'NT', categoryTa: 'பொதுவான நிருபங்கள்', chaptersCount: 13, totalVerses: 303, chapterVerses: [14,18,19,16,14,20,28,13,28,39,40,29,25] },
+      { id: 59, nameTa: 'யாக்கோபு', nameEn: 'James', testament: 'NT', categoryTa: 'பொதுவான நிருபங்கள்', chaptersCount: 5, totalVerses: 108, chapterVerses: [27,26,18,17,20] },
+      { id: 60, nameTa: '1 பேதுரு', nameEn: '1 Peter', testament: 'NT', categoryTa: 'பொதுவான நிருபங்கள்', chaptersCount: 5, totalVerses: 105, chapterVerses: [25,25,22,19,14] },
+      { id: 61, nameTa: '2 பேதுரு', nameEn: '2 Peter', testament: 'NT', categoryTa: 'பொதுவான நிருபங்கள்', chaptersCount: 3, totalVerses: 61, chapterVerses: [21,22,18] },
+      { id: 62, nameTa: '1 யோவான்', nameEn: '1 John', testament: 'NT', categoryTa: 'பொதுவான நிருபங்கள்', chaptersCount: 5, totalVerses: 105, chapterVerses: [10,29,24,21,21] },
+      { id: 63, nameTa: '2 யோவான்', nameEn: '2 John', testament: 'NT', categoryTa: 'பொதுவான நிருபங்கள்', chaptersCount: 1, totalVerses: 13, chapterVerses: [13] },
+      { id: 64, nameTa: '3 யோவான்', nameEn: '3 John', testament: 'NT', categoryTa: 'பொதுவான நிருபங்கள்', chaptersCount: 1, totalVerses: 14, chapterVerses: [14] },
+      { id: 65, nameTa: 'யூதா', nameEn: 'Jude', testament: 'NT', categoryTa: 'பொதுவான நிருபங்கள்', chaptersCount: 1, totalVerses: 25, chapterVerses: [25] },
+      { id: 66, nameTa: 'வெளிப்படுத்தின விசேஷம்', nameEn: 'Revelation', testament: 'NT', categoryTa: 'தீர்க்கதரிசனம்', chaptersCount: 22, totalVerses: 404, chapterVerses: [20,29,22,11,14,17,17,13,21,11,19,17,18,20,8,21,18,24,21,15,27,21] }
+    ];
+
+    const TOTAL_BIBLE_VERSES = 31102;
+    const TOTAL_BIBLE_CHAPTERS = 1189;
+
+    // LOCAL STORAGE HANDLING
+    const STORAGE_KEY = 'tamil_bible_reading_progress_v1';
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {
+          readVerses: {},
+          readChapters: {},
+          dailyActivity: {},
+          activePlan: 'yearly_plan',
+          tenVersesDay: 1,
+          oneChapterDay: 1,
+          yearlyPlanDay: 1,
+          lastRead: { bookId: 1, chapter: 1, verse: 1 }
+        };
+      } catch(e) {
+        return { readVerses: {}, readChapters: {}, dailyActivity: {}, activePlan: 'yearly_plan', tenVersesDay: 1, oneChapterDay: 1, yearlyPlanDay: 1 };
+      }
+    }
+
+    function saveState(state) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+    }
+
+    // MAIN STANDALONE APPLICATION
+    const { useState, useEffect, useMemo } = React;
+
+    function StandaloneApp() {
+      const [showSplash, setShowSplash] = useState(true);
+      const [splashProgress, setSplashProgress] = useState(0);
+      const [state, setState] = useState(loadState);
+      const [view, setView] = useState('dashboard');
+      const [selectedBookId, setSelectedBookId] = useState(1);
+      const [selectedChapter, setSelectedChapter] = useState(1);
+      const [searchTerm, setSearchTerm] = useState('');
+      const [testamentFilter, setTestamentFilter] = useState('ALL');
+
+      // 5-second splash screen
+      useEffect(() => {
+        const timer = setInterval(() => {
+          setSplashProgress(prev => {
+            if (prev >= 100) {
+              clearInterval(timer);
+              setShowSplash(false);
+              return 100;
+            }
+            return prev + 2;
+          });
+        }, 100);
+        return () => clearInterval(timer);
+      }, []);
+
+      useEffect(() => {
+        saveState(state);
+      }, [state]);
+
+      // Calculate totals
+      const totalVersesRead = useMemo(() => {
+        let count = 0;
+        BIBLE_BOOKS.forEach(b => {
+          for (let c = 1; c <= b.chaptersCount; c++) {
+            const isChapDone = !!state.readChapters[`${b.id}_${c}`];
+            const maxV = b.chapterVerses[c - 1] || 25;
+            for (let v = 1; v <= maxV; v++) {
+              if (isChapDone || state.readVerses[`${b.id}_${c}_${v}`]) count++;
+            }
+          }
+        });
+        return count;
+      }, [state]);
+
+      const percentVerses = ((totalVersesRead / TOTAL_BIBLE_VERSES) * 100).toFixed(2);
+
+      const totalChaptersRead = useMemo(() => {
+        let count = 0;
+        BIBLE_BOOKS.forEach(b => {
+          for (let c = 1; c <= b.chaptersCount; c++) {
+            const isChapDone = !!state.readChapters[`${b.id}_${c}`];
+            if (isChapDone) count++;
+          }
+        });
+        return count;
+      }, [state]);
+
+      // Toggle verse
+      const toggleVerse = (bookId, chap, verse) => {
+        const key = `${bookId}_${chap}_${verse}`;
+        setState(prev => {
+          const newVerses = { ...prev.readVerses };
+          if (newVerses[key]) delete newVerses[key];
+          else newVerses[key] = true;
+          return { ...prev, readVerses: newVerses, lastRead: { bookId, chapter: chap, verse } };
+        });
+      };
+
+      // Toggle chapter
+      const toggleChapter = (bookId, chap) => {
+        const key = `${bookId}_${chap}`;
+        const book = BIBLE_BOOKS.find(b => b.id === bookId);
+        const maxV = book.chapterVerses[chap - 1] || 25;
+        setState(prev => {
+          const newChaps = { ...prev.readChapters };
+          const newVerses = { ...prev.readVerses };
+          if (newChaps[key]) {
+            delete newChaps[key];
+            for (let v = 1; v <= maxV; v++) delete newVerses[`${bookId}_${chap}_${v}`];
+          } else {
+            newChaps[key] = true;
+            for (let v = 1; v <= maxV; v++) newVerses[`${bookId}_${chap}_${v}`] = true;
+          }
+          return { ...prev, readChapters: newChaps, readVerses: newVerses };
+        });
+      };
+
+      const selectedBook = BIBLE_BOOKS.find(b => b.id === selectedBookId) || BIBLE_BOOKS[0];
+
+      return React.createElement('div', { className: 'min-h-screen bg-slate-950 text-slate-100 flex flex-col' },
+        // 5-SECOND SPLASH SCREEN
+        showSplash ? React.createElement('div', {
+          onClick: () => setShowSplash(false),
+          className: 'fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a111e] text-slate-100 px-6 cursor-pointer select-none'
+        },
+          React.createElement('div', { className: 'relative z-10 flex flex-col items-center text-center max-w-md w-full' },
+            // Amber Glowing Cross
+            React.createElement('div', { className: 'relative mb-6' },
+              React.createElement('svg', { className: 'w-24 h-28 text-[#f7b036] drop-shadow-[0_0_25px_rgba(247,176,54,0.7)]', viewBox: '0 0 100 120', fill: 'currentColor' },
+                React.createElement('rect', { x: '36', y: '6', width: '28', height: '108', rx: '14' }),
+                React.createElement('rect', { x: '8', y: '34', width: '84', height: '28', rx: '14' })
+              )
+            ),
+            React.createElement('h1', { className: 'text-xl sm:text-2xl font-black text-[#f7b036] tracking-wider uppercase mb-2' }, "JESUS CHRIST'S LOVING MINISTRY"),
+            React.createElement('p', { className: 'text-base sm:text-lg text-slate-200 font-medium mb-1' }, "இயேசு கிறிஸ்துவின் அன்பின் ஊழியம்"),
+            React.createElement('p', { className: 'text-xs font-bold tracking-[0.25em] text-slate-400 uppercase mb-8' }, "BY P. PETHURAJ"),
+            React.createElement('div', { className: 'w-60 h-1.5 bg-slate-800 rounded-full overflow-hidden mb-6' },
+              React.createElement('div', { className: 'h-full bg-gradient-to-r from-amber-500 via-emerald-400 to-emerald-300 rounded-full transition-all duration-75', style: { width: `${splashProgress}%` } })
+            ),
+            React.createElement('button', { className: 'text-xs text-slate-400 py-1.5 px-4 rounded-full border border-slate-700 bg-slate-800/60' }, "தொடங்க தட்டவும் (Tap to start)")
+          )
+        ) : null,
+
+        // TOP HEADER BAR
+        React.createElement('header', { className: 'sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3' },
+          React.createElement('div', { className: 'max-w-5xl mx-auto flex items-center justify-between' },
+            React.createElement('button', { onClick: () => setView('dashboard'), className: 'flex items-center gap-2 text-left' },
+              React.createElement('div', { className: 'w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-slate-950' }, "✝"),
+              React.createElement('div', null,
+                React.createElement('div', { className: 'text-sm font-bold text-slate-100' }, "Tamil Bible Reading"),
+                React.createElement('div', { className: 'text-[10px] text-amber-400' }, "இயேசு கிறிஸ்துவின் அன்பின் ஊழியம்")
+              )
+            ),
+            React.createElement('div', { className: 'flex items-center gap-2' },
+              React.createElement('button', { onClick: () => setView('dashboard'), className: `px-2.5 py-1 text-xs font-semibold rounded-lg ${view === 'dashboard' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-300'}` }, "முகப்பு"),
+              React.createElement('button', { onClick: () => setView('books'), className: `px-2.5 py-1 text-xs font-semibold rounded-lg ${view === 'books' || view === 'chapters' || view === 'verses' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-300'}` }, "புத்தகங்கள்"),
+              React.createElement('button', { onClick: () => setView('reports'), className: `px-2.5 py-1 text-xs font-semibold rounded-lg ${view === 'reports' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-300'}` }, "அறிக்கைகள்"),
+              React.createElement('button', { onClick: () => setView('about'), className: `px-2.5 py-1 text-xs font-semibold rounded-lg ${view === 'about' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-300'}` }, "ஊழியம்")
+            )
+          )
+        ),
+
+        // MAIN VIEW
+        React.createElement('main', { className: 'flex-1 max-w-5xl mx-auto px-4 py-5 w-full' },
+          // VIEW: DASHBOARD
+          view === 'dashboard' ? React.createElement('div', { className: 'space-y-5' },
+            React.createElement('div', { className: 'p-5 rounded-2xl bg-gradient-to-r from-slate-800 to-amber-950/30 border border-slate-700' },
+              React.createElement('div', { className: 'text-xs text-amber-400 font-semibold' }, "இயேசு கிறிஸ்துவின் அன்பின் ஊழியம் • BY P. PETHURAJ"),
+              React.createElement('h2', { className: 'text-2xl font-bold text-slate-100 mt-1' }, "வேத வாசிப்பு அட்டவணை"),
+              React.createElement('p', { className: 'text-xs text-slate-300 mt-1' }, "66 புத்தகங்கள் • 1,189 அதிகாரங்கள் • 31,102 வசனங்கள் துல்லியமான கண்காணிப்பு")
+            ),
+
+            // Today's Reading Card
+            React.createElement('div', { className: 'p-5 rounded-2xl bg-slate-900 border-2 border-amber-500/50' },
+              React.createElement('div', { className: 'text-xs text-amber-400 font-bold' }, "இன்றைய வாசிப்பு (Today's Reading)"),
+              React.createElement('div', { className: 'text-2xl font-black text-amber-400 mt-1' }, "ஆதியாகமம் 1 (Genesis 1)"),
+              React.createElement('button', {
+                onClick: () => { setSelectedBookId(1); setSelectedChapter(1); setView('verses'); },
+                className: 'mt-3 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm shadow-md'
+              }, "இன்று படிக்க வேண்டிய passage நேரடியாக திறக்கவும் →")
+            ),
+
+            // Accurate Totals Grid
+            React.createElement('div', { className: 'grid grid-cols-2 sm:grid-cols-4 gap-3' },
+              React.createElement('div', { className: 'p-4 rounded-xl bg-slate-800/80 border border-slate-700' },
+                React.createElement('div', { className: 'text-xs text-slate-400' }, "வசனங்கள் சதவீதம்"),
+                React.createElement('div', { className: 'text-2xl font-black text-amber-400 mt-1' }, `${percentVerses}%`),
+                React.createElement('div', { className: 'text-[11px] text-slate-400' }, `${totalVersesRead.toLocaleString()} / 31,102`)
+              ),
+              React.createElement('div', { className: 'p-4 rounded-xl bg-slate-800/80 border border-slate-700' },
+                React.createElement('div', { className: 'text-xs text-slate-400' }, "அதிகாரங்கள்"),
+                React.createElement('div', { className: 'text-2xl font-black text-slate-100 mt-1' }, `${totalChaptersRead}`),
+                React.createElement('div', { className: 'text-[11px] text-slate-400' }, `/ 1,189 அதிகாரங்கள்`)
+              ),
+              React.createElement('div', { className: 'p-4 rounded-xl bg-slate-800/80 border border-slate-700' },
+                React.createElement('div', { className: 'text-xs text-slate-400' }, "பழைய ஏற்பாடு"),
+                React.createElement('div', { className: 'text-2xl font-black text-slate-100 mt-1' }, "39"),
+                React.createElement('div', { className: 'text-[11px] text-slate-400' }, "929 அதிகாரங்கள்")
+              ),
+              React.createElement('div', { className: 'p-4 rounded-xl bg-slate-800/80 border border-slate-700' },
+                React.createElement('div', { className: 'text-xs text-slate-400' }, "புதிய ஏற்பாடு"),
+                React.createElement('div', { className: 'text-2xl font-black text-slate-100 mt-1' }, "27"),
+                React.createElement('div', { className: 'text-[11px] text-slate-400' }, "260 அதிகாரங்கள்")
+              )
+            ),
+
+            React.createElement('button', {
+              onClick: () => setView('books'),
+              className: 'w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold border border-slate-700 text-sm'
+            }, "66 வேத புத்தகங்கள் பட்டியலை திறக்க →")
+          ) : null,
+
+          // VIEW: 66 BOOKS LIST
+          view === 'books' ? React.createElement('div', { className: 'space-y-4' },
+            React.createElement('div', { className: 'flex items-center justify-between' },
+              React.createElement('h2', { className: 'text-xl font-bold' }, "66 வேத புத்தகங்கள் (Tamil + English)"),
+              React.createElement('span', { className: 'text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30' }, 
+                `${BIBLE_BOOKS.filter(b => {
+                  if (testamentFilter === 'OT' && b.testament !== 'OT') return false;
+                  if (testamentFilter === 'NT' && b.testament !== 'NT') return false;
+                  const q = searchTerm.toLowerCase().trim();
+                  return !q || b.nameTa.toLowerCase().includes(q) || b.nameEn.toLowerCase().includes(q) || b.categoryTa.toLowerCase().includes(q);
+                }).length} / 66 புத்தகங்கள்`
+              )
+            ),
+            // Global Search Input
+            React.createElement('div', { className: 'relative' },
+              React.createElement('input', {
+                type: 'text',
+                value: searchTerm,
+                onChange: (e) => setSearchTerm(e.target.value),
+                onKeyDown: (e) => {
+                  if (e.key === 'Enter') {
+                    const matches = BIBLE_BOOKS.filter(b => {
+                      if (testamentFilter === 'OT' && b.testament !== 'OT') return false;
+                      if (testamentFilter === 'NT' && b.testament !== 'NT') return false;
+                      const q = searchTerm.toLowerCase().trim();
+                      return !q || b.nameTa.toLowerCase().includes(q) || b.nameEn.toLowerCase().includes(q) || b.categoryTa.toLowerCase().includes(q);
+                    });
+                    if (matches.length > 0) {
+                      setSelectedBookId(matches[0].id);
+                      setView('chapters');
+                    }
+                  }
+                },
+                placeholder: 'புத்தகத்தின் தமிழ் அல்லது ஆங்கிலப் பெயரைத் தேடுங்கள்... (எ.கா: ஆதியாகமம், Genesis, யோவான், John)',
+                className: 'w-full bg-slate-800/95 border-2 border-slate-700/80 focus:border-amber-500 rounded-2xl pl-4 pr-16 py-3 text-sm sm:text-base text-slate-100 placeholder:text-slate-400 focus:outline-none transition-all'
+              }),
+              searchTerm ? React.createElement('button', {
+                onClick: () => setSearchTerm(''),
+                className: 'absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-200 bg-slate-700 px-2 py-1 rounded'
+              }, "அழி") : null
+            ),
+            // Testament filter tabs
+            React.createElement('div', { className: 'flex gap-2' },
+              React.createElement('button', {
+                onClick: () => setTestamentFilter('ALL'),
+                className: `px-3 py-1 rounded-lg text-xs font-semibold ${testamentFilter === 'ALL' ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'}`
+              }, "அனைத்தும் (66)"),
+              React.createElement('button', {
+                onClick: () => setTestamentFilter('OT'),
+                className: `px-3 py-1 rounded-lg text-xs font-semibold ${testamentFilter === 'OT' ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'}`
+              }, "பழைய ஏற்பாடு (39)"),
+              React.createElement('button', {
+                onClick: () => setTestamentFilter('NT'),
+                className: `px-3 py-1 rounded-lg text-xs font-semibold ${testamentFilter === 'NT' ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'}`
+              }, "புதிய ஏற்பாடு (27)")
+            ),
+            React.createElement('div', { className: 'grid grid-cols-1 sm:grid-cols-2 gap-2.5' },
+              BIBLE_BOOKS.filter(b => {
+                if (testamentFilter === 'OT' && b.testament !== 'OT') return false;
+                if (testamentFilter === 'NT' && b.testament !== 'NT') return false;
+                const q = searchTerm.toLowerCase().trim();
+                return !q || b.nameTa.toLowerCase().includes(q) || b.nameEn.toLowerCase().includes(q) || b.categoryTa.toLowerCase().includes(q);
+              }).map(b => React.createElement('button', {
+                key: b.id,
+                onClick: () => { setSelectedBookId(b.id); setView('chapters'); },
+                className: 'p-3.5 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-amber-500 text-left transition-all'
+              },
+                React.createElement('div', { className: 'text-base font-bold text-slate-100' }, `${b.nameTa} (${b.nameEn})`),
+                React.createElement('div', { className: 'text-xs text-slate-400 mt-1' }, `${b.testament === 'OT' ? 'பழைய ஏற்பாடு' : 'புதிய ஏற்பாடு'} • ${b.chaptersCount} அதிகாரங்கள் • ${b.totalVerses} வசனங்கள்`)
+              ))
+            )
+          ) : null,
+
+          // VIEW: CHAPTERS SCREEN (SCREEN 1)
+          view === 'chapters' ? React.createElement('div', { className: 'space-y-4' },
+            React.createElement('div', { className: 'flex items-center justify-between' },
+              React.createElement('button', { onClick: () => setView('books'), className: 'text-xs text-amber-400 font-semibold' }, "← புத்தகங்கள் பட்டியல்"),
+              React.createElement('span', { className: 'text-xs text-slate-400' }, `${selectedBook.chaptersCount} அதிகாரங்கள்`)
+            ),
+            React.createElement('div', { className: 'p-4 rounded-xl bg-slate-800 border border-slate-700' },
+              React.createElement('h1', { className: 'text-2xl font-bold text-amber-400' }, `${selectedBook.nameTa} (${selectedBook.nameEn})`),
+              React.createElement('p', { className: 'text-xs text-slate-300' }, `மொத்தம் ${selectedBook.chaptersCount} அதிகாரங்கள் • ${selectedBook.totalVerses} வசனங்கள்`)
+            ),
+            React.createElement('div', { className: 'text-sm font-bold text-slate-300' }, "அதிகாரங்கள் (Chapters):"),
+            React.createElement('div', { className: 'grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2.5' },
+              Array.from({ length: selectedBook.chaptersCount }, (_, i) => i + 1).map(cNum => {
+                const isDone = !!state.readChapters[`${selectedBook.id}_${cNum}`];
+                return React.createElement('div', {
+                  key: cNum,
+                  className: `rounded-xl border flex flex-col justify-between overflow-hidden ${isDone ? 'bg-emerald-950/40 border-emerald-500' : 'bg-slate-800 border-slate-700'}`
+                },
+                  React.createElement('button', {
+                    onClick: () => { setSelectedChapter(cNum); setView('verses'); },
+                    className: 'p-3 text-center'
+                  },
+                    React.createElement('div', { className: 'text-xs text-slate-400' }, "அதி."),
+                    React.createElement('div', { className: 'text-xl font-bold' }, cNum)
+                  ),
+                  React.createElement('button', {
+                    onClick: () => toggleChapter(selectedBook.id, cNum),
+                    className: `text-[10px] py-1 border-t ${isDone ? 'bg-emerald-600 text-white font-bold' : 'bg-slate-900 text-slate-400'}`
+                  }, isDone ? 'முடிந்தது' : 'குறிக்க')
+                );
+              })
+            )
+          ) : null,
+
+          // VIEW: VERSES SCREEN (SCREEN 2)
+          view === 'verses' ? React.createElement('div', { className: 'space-y-4' },
+            React.createElement('div', { className: 'flex items-center justify-between' },
+              React.createElement('button', { onClick: () => setView('chapters'), className: 'text-xs text-amber-400 font-semibold' }, `← ${selectedBook.nameTa} அதிகாரங்கள்`),
+              React.createElement('div', { className: 'flex gap-2' },
+                React.createElement('button', {
+                  disabled: selectedChapter <= 1,
+                  onClick: () => setSelectedChapter(c => Math.max(1, c - 1)),
+                  className: 'px-2 py-1 bg-slate-800 rounded text-xs disabled:opacity-40'
+                }, "முந்தையது"),
+                React.createElement('button', {
+                  disabled: selectedChapter >= selectedBook.chaptersCount,
+                  onClick: () => setSelectedChapter(c => Math.min(selectedBook.chaptersCount, c + 1)),
+                  className: 'px-2 py-1 bg-slate-800 rounded text-xs disabled:opacity-40'
+                }, "அடுத்தது")
+              )
+            ),
+            React.createElement('div', { className: 'p-4 rounded-xl bg-slate-800 border border-slate-700' },
+              React.createElement('h1', { className: 'text-2xl font-bold text-amber-400' }, `${selectedBook.nameTa} - அதிகாரம் ${selectedChapter}`),
+              React.createElement('p', { className: 'text-xs text-slate-300' }, `இந்த அதிகாரத்தில் மொத்தம் ${selectedBook.chapterVerses[selectedChapter - 1] || 25} வசனங்கள் உள்ளன. வசனத்தைத் தட்டி வாசித்ததாக குறிக்கவும்.`)
+            ),
+            React.createElement('div', { className: 'flex justify-end' },
+              React.createElement('button', {
+                onClick: () => toggleChapter(selectedBook.id, selectedChapter),
+                className: 'px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg'
+              }, "முழு அதிகாரத்தையும் குறிக்க / மாற்ற")
+            ),
+            React.createElement('div', { className: 'grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2' },
+              Array.from({ length: selectedBook.chapterVerses[selectedChapter - 1] || 25 }, (_, i) => i + 1).map(vNum => {
+                const isVRead = !!state.readVerses[`${selectedBook.id}_${selectedChapter}_${vNum}`] || !!state.readChapters[`${selectedBook.id}_${selectedChapter}`];
+                return React.createElement('button', {
+                  key: vNum,
+                  onClick: () => toggleVerse(selectedBook.id, selectedChapter, vNum),
+                  className: `h-14 rounded-xl font-bold flex flex-col items-center justify-center border transition-all ${isVRead ? 'bg-emerald-600 border-emerald-400 text-white shadow-md' : 'bg-slate-800 border-slate-700 text-slate-200'}`
+                },
+                  React.createElement('span', { className: 'text-lg' }, vNum),
+                  React.createElement('span', { className: 'text-[9px] opacity-80' }, isVRead ? '✓ முடிந்தது' : 'வசனம்')
+                );
+              })
+            )
+          ) : null,
+
+          // VIEW: REPORTS
+          view === 'reports' ? React.createElement('div', { className: 'space-y-5' },
+            React.createElement('h2', { className: 'text-xl font-bold' }, "துல்லியமான வேத வாசிப்பு அறிக்கைகள்"),
+            React.createElement('div', { className: 'p-6 rounded-2xl bg-gradient-to-br from-slate-800 to-amber-950/30 border border-amber-500/40 text-center' },
+              React.createElement('div', { className: 'text-xs text-slate-400 uppercase tracking-wider' }, "மொத்த வேதாகம வாசிப்பு சதவீதம்"),
+              React.createElement('div', { className: 'text-4xl font-black text-amber-400 my-2' }, `${percentVerses}%`),
+              React.createElement('div', { className: 'text-sm text-slate-300' }, `${totalVersesRead.toLocaleString()} / 31,102 வசனங்கள் வாசிக்கப்பட்டது`)
+            ),
+            React.createElement('div', { className: 'grid grid-cols-1 sm:grid-cols-2 gap-4' },
+              React.createElement('div', { className: 'p-4 rounded-xl bg-slate-800 border border-slate-700' },
+                React.createElement('h3', { className: 'font-bold text-amber-400' }, "பழைய ஏற்பாடு (Old Testament)"),
+                React.createElement('p', { className: 'text-xs text-slate-400 mt-1' }, "39 புத்தகங்கள் • 929 அதிகாரங்கள் • 23,145 வசனங்கள்")
+              ),
+              React.createElement('div', { className: 'p-4 rounded-xl bg-slate-800 border border-slate-700' },
+                React.createElement('h3', { className: 'font-bold text-emerald-400' }, "புதிய ஏற்பாடு (New Testament)"),
+                React.createElement('p', { className: 'text-xs text-slate-400 mt-1' }, "27 புத்தகங்கள் • 260 அதிகாரங்கள் • 7,957 வசனங்கள்")
+              )
+            )
+          ) : null,
+
+          // VIEW: ABOUT US
+          view === 'about' ? React.createElement('div', { className: 'space-y-5 max-w-xl mx-auto text-center' },
+            React.createElement('div', { className: 'p-6 rounded-2xl bg-slate-900 border-2 border-amber-500/50' },
+              React.createElement('div', { className: 'text-3xl text-amber-400 mb-2' }, "✝"),
+              React.createElement('h1', { className: 'text-xl font-bold text-amber-400 uppercase' }, "JESUS CHRIST'S LOVING MINISTRY"),
+              React.createElement('p', { className: 'text-base font-semibold text-slate-100' }, "இயேசு கிறிஸ்துவின் அன்பின் ஊழியம்"),
+              React.createElement('p', { className: 'text-xs tracking-widest text-slate-400 uppercase mt-1' }, "BY P. PETHURAJ"),
+              React.createElement('button', {
+                onClick: () => setShowSplash(true),
+                className: 'mt-4 px-4 py-2 rounded-full bg-slate-800 text-xs font-semibold text-amber-300 border border-slate-700'
+              }, "அறிமுகத் திரையைக் காண்க (Play Welcome Screen)")
+            ),
+
+            React.createElement('div', { className: 'p-5 rounded-2xl bg-slate-800 border border-emerald-500/50 text-left' },
+              React.createElement('div', { className: 'text-xs text-emerald-400 font-bold uppercase' }, "வாட்ஸ்அப் தொடர்பு (WhatsApp)"),
+              React.createElement('div', { className: 'text-xl font-bold text-slate-100 mt-0.5' }, "+919840041759"),
+              React.createElement('p', { className: 'text-xs text-slate-400 mt-1' }, "ஜெப விண்ணப்பங்கள் மற்றும் ஆலோசனைகளுக்கு வாட்ஸ்அப்பில் தொடர்பு கொள்ளவும்."),
+              React.createElement('a', {
+                href: 'https://wa.me/919840041759?text=%E0%AE%B5%E0%AE%A3%E0%AE%95%E0%AF%8D%E0%AE%95%E0%AE%AE%E0%AF%8D%20%E0%AE%85%E0%AE%AF%E0%AF%8D%E0%AE%AF%E0%AE%BE',
+                target: '_blank',
+                rel: 'noopener noreferrer',
+                className: 'mt-3 inline-block px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-md'
+              }, "வாட்ஸ்அப்பில் செய்தி அனுப்ப →")
+            )
+          ) : null
+        )
+      );
+    }
+
+    ReactDOM.render(React.createElement(StandaloneApp), document.getElementById('root'));
+  </script>
+</body>
+</html>

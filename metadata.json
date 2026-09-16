@@ -1,0 +1,8 @@
+{
+  "name": "Tamil Bible Reading | தமிழ் பைபிள் தின வாசிப்பு",
+  "description": "தமிழ் பைபிள் தின வாசிப்பு - 10 வசனங்கள், 1 அதிகாரம், 3 மாதங்கள், 6 மாதங்கள் மற்றும் 1 வருட வாசிப்பு திட்டங்கள், தொடர் கண்காணிப்பு மற்றும் வேத தியானம்.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
